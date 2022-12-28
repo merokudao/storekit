@@ -17,7 +17,7 @@ const config = {
     return [
       {
         source: "/",
-        destination: "/bitpack-core"
+        destination: "/meroku-server"
       }
     ];
   },
