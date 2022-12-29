@@ -6,7 +6,7 @@ info:
   contact:
     email: hardik.agarwal@bitpack.me
 servers:
-  - url: https://api.meroku.store/api
+  - url: https://api-test.meroku.store
     description: Testing Server
   - url: http://localhost:8080/api
     description: Development Server
