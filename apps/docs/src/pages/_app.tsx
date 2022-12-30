@@ -18,10 +18,12 @@ const MyApp: AppType = ({ Component, pageProps }) => {
   }
 
   return (
-    <SessionProvider session={(pageProps as any).session}>
-      <Navbar />
+    // <>
+    // <SessionProvider session={(pageProps as any).session}>
+    //   <Navbar />
       <Component {...pageProps} />
-    </SessionProvider>
+    // </SessionProvider>
+    // </>
   );
 };
 
