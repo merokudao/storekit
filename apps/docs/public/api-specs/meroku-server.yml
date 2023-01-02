@@ -8,7 +8,7 @@ info:
 servers:
   - url: https://api.meroku.store/api
     description: Testing Server
-  - url: http://localhost:8080/api
+  - url: http://localhost:8000/api
     description: Development Server
 tags:
   - name: Dapp Registry

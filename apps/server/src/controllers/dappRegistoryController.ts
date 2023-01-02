@@ -6,10 +6,9 @@ import Debug from "debug";
 import parseISO from "date-fns/parseISO";
 
 const debug = Debug("meroku:server");
-var utils = require("../utils/writer.js");
 const DappStore = new DappStoreRegistry();
 
-class DappRegistory {
+class DappRegistry {
   constructor() {
     this.getDapps = this.getDapps.bind(this);
     this.addDapp = this.addDapp.bind(this);
@@ -108,13 +107,13 @@ class DappRegistory {
 
       if (search && search.trim() !== "") {
         const response: DAppSchema[] = DappStore.search(search, filterOpts);
-        utils.writeJson(res, response);
+        return res.json(response);
       } else {
         const response: DAppSchema[] = await DappStore.dApps(filterOpts);
-        utils.writeJson(res, response);
+        return res.json(response);
       }
     } catch (e) {
-      utils.writeJson(res, e, 400);
+      return res.status(400).json({ errors: [{ msg: e.message }] });
     }
   };
 
@@ -138,14 +137,14 @@ class DappRegistory {
           dapp,
           org
         );
-        utils.writeJson(res, response);
+        return res.json(response);
       } catch (e) {
-        utils.writeJson(res, e, 400);
+        return res.status(400).json({ errors: [{ msg: e.message }] });
       }
     } else {
       // errors
       debug(`Validation errors: ${result}`);
-      utils.writeJson(res, "Validation errors", 400);
+      return res.status(200).json({ errors: result.array() });
     }
   };
 
@@ -169,14 +168,14 @@ class DappRegistory {
           dapp,
           org
         );
-        utils.writeJson(res, response);
+        return res.json(response);
       } catch (e) {
-        utils.writeJson(res, e, 400);
+        return res.status(400).json({ errors: [{ msg: e.message }] });
       }
     } else {
       // errors
       debug(`Validation errors: ${result}`);
-      utils.writeJson(res, "Validation errors", 400);
+      return res.status(400).json({ errors: [{ msg: result }] });
     }
   };
 
@@ -201,16 +200,16 @@ class DappRegistory {
           dappId,
           org
         );
-        utils.writeJson(res, response);
+        return res.json(response);
       } catch (e) {
-        utils.writeJson(res, e, 400);
+        return res.status(400).json({ errors: [{ msg: e.message }] })
       }
     } else {
       // errors
       debug(`Validation errors: ${result}`);
-      utils.writeJson(res, "Validation errors", 400);
+      return res.status(400).json({ errors: [{ msg: result }] });
     }
   };
 }
 
-export default new DappRegistory();
+export default new DappRegistry();

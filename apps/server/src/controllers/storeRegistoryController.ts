@@ -1,7 +1,6 @@
 import { Request, Response } from "express";
 import { DappStoreRegistry } from "@merokudao/dapp-store-registry";
 
-var utils = require("../utils/writer.js");
 const DappStore = new DappStoreRegistry();
 
 class StoreRegistory {
@@ -14,9 +13,9 @@ class StoreRegistory {
     try {
       await DappStore.init();
       const response = DappStore.getRegistryTitle();
-      utils.writeJson(res, response);
+      return res.json(response);
     } catch (e) {
-      utils.writeJson(res, e, 400);
+      return res.status(400).json({ errors: [{ msg: e.message }] })
     }
   };
 
@@ -24,9 +23,9 @@ class StoreRegistory {
     try {
       await DappStore.init();
       const response = DappStore.getFeaturedDapps();
-      utils.writeJson(res, response);
+      return res.json(response);
     } catch (e) {
-      utils.writeJson(res, e, 400);
+      return res.status(400).json({ errors: [{ msg: e.message }] })
     }
   };
 }

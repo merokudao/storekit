@@ -5,8 +5,9 @@
   "main": "index.ts",
   "scripts": {
     "build": "tsc --project ./",
-    "start:dev": "nodemon src/server.ts",
-    "start:prod": "nodemon src/server.ts"
+    "clean": "rm -rf dist",
+    "start:dev": "yarn clean && DEBUG=meroku:* nodemon src/server.ts",
+    "start:prod": "pm2 start dist/server.js"
   },
   "keywords": [],
   "author": "",
@@ -19,6 +20,7 @@
     "dotenv": "^16.0.3",
     "express": "^4.18.2",
     "express-validator": "^6.14.2",
+    "pm2": "^5.2.2",
     "ts-node": "^10.9.1"
   },
   "devDependencies": {
