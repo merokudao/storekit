@@ -15,7 +15,7 @@ FROM node:19.3.0-alpine AS runner
 
 WORKDIR /storekit
 
-COPY --from=builder /storekit/src ./src
+COPY --from=builder /storekit/dist ./dist
 COPY --from=builder /storekit/node_modules ./node_modules
 COPY package*.json ./
 

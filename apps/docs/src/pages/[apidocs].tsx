@@ -73,8 +73,8 @@ const APIDocs: NextPage = () => {
   return (
     <>
       <Head>
-        <title>Bitpack.me API Docs</title>
-        <meta name="description" content="API docs for bitpack.me" />
+        <title>Meroku Storekit API Docs</title>
+        <meta name="description" content="API docs for Meroku StoreKit." />
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main>
