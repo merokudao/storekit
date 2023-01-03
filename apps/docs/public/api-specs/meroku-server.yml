@@ -6,7 +6,7 @@ info:
   contact:
     email: hardik.agarwal@bitpack.me
 servers:
-  - url: https://api-test.meroku.store
+  - url: https://api-a.meroku.store
     description: Testing Server
   - url: http://localhost:8080/api
     description: Development Server
@@ -14,7 +14,7 @@ tags:
   - name: Dapp Registry
     description: Dapp registry endpoint to `get`, `create`, `update`, `delete` dapp in meroku store and `get` registry title
   - name: Store Registry
-    description: Meroku store registory to `get` the store title
+    description: Meroku store registry to `get` the store title
 paths:
   /dapp:
     put:
@@ -343,7 +343,7 @@ components:
         - description
         - key
         - dappIds
-    Registory:
+    Registry:
       type: object
       properties:
         title:
