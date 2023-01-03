@@ -12,7 +12,8 @@
       "cache": false
     },
     "start:dev": {
-      "cache": false
+      "cache": false,
+      "env": ["PORT"]
     }
   },
   "globalEnv": [

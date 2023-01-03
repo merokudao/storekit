@@ -20,7 +20,7 @@ const MyApp: AppType = ({ Component, pageProps }) => {
   return (
     <SessionProvider session={(pageProps as any).session}>
       <Navbar />
-      <Component {...pageProps} />
+      { Component ?  <Component {...pageProps} /> : undefined }
     </SessionProvider>
   );
 };

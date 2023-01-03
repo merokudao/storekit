@@ -57,7 +57,7 @@ const APIDocs: NextPage = () => {
         console.log("User is unauthenticated, redirecting to /api/auth/signin");
       });
     }
-  }, [query, router, status, emailDomain]);
+  }, [query, router, status, emailDomain, session?.user?.email]);
 
   if (
     !query ||
