@@ -1,8 +1,8 @@
 openapi: 3.0.3
 info:
-  title: Meroku dapp store
+  title: Meroku dApp store
   version: "1.2"
-  description: "Open API specs for Meroku Dapp store."
+  description: "Open API specs for Meroku DApp store."
   contact:
     email: hardik.agarwal@bitpack.me
 servers:
@@ -11,18 +11,18 @@ servers:
   - url: http://localhost:8000/api
     description: Development Server
 tags:
-  - name: Dapp Registry
-    description: Dapp registry endpoint to `get`, `create`, `update`, `delete` dapp in meroku store and `get` registry title
+  - name: DApp Registry
+    description: DApp registry endpoint to `get`, `create`, `update`, `delete` dApp in meroku store and `get` registry title
   - name: Store Registry
     description: Meroku store registry to `get` the store title
 paths:
   /dapp:
     put:
       tags:
-        - Dapp Registry
+        - DApp Registry
       summary: Update dApp
-      description: For updating the exisitng dapp
-      operationId: updateDapp
+      description: For updating the existing dApp
+      operationId: updateDApp
       requestBody:
         description: Send the request with the updated parameters
         content:
@@ -40,25 +40,25 @@ paths:
         "400":
           description: Invalid ID supplied
         "404":
-          description: Dapp not found
+          description: DApp not found
         "405":
           description: Validation exception
     post:
       tags:
-        - Dapp Registry
+        - DApp Registry
       summary: Add dApp
-      description: adding new dapp to the store
-      operationId: addDapp
+      description: Adding new dApp to the store
+      operationId: addDApp
       requestBody:
-        description: Send the request with dapp schema parameters
+        description: Send the request with dApp schema parameters
         content:
           application/x-www-form-urlencoded:
             schema:
-              $ref: "#/components/schemas/Dapp"
+              $ref: "#/components/schemas/DappWithDevCreds"
         required: true
       responses:
         "200":
-          description: successful operation
+          description: Successful operation
           content:
             application/json:
               schema:
@@ -66,19 +66,19 @@ paths:
         "400":
           description: Invalid ID supplied
         "404":
-          description: Dapp not found
+          description: DApp not found
         "405":
           description: Validation exception
     get:
       tags:
-        - Dapp Registry
+        - DApp Registry
       summary: Get dApp
-      description: User can search dapp by input string along with choosing either one or more filter options
-      operationId: getDapps
+      description: User can search dApp by input string along with choosing either one or more filter options
+      operationId: getDApp
       parameters:
         - in: query
           name: search
-          description: Dapp name
+          description: DApp name
           required: false
           schema:
             type: string
@@ -119,7 +119,7 @@ paths:
           required: false
           schema:
             type: boolean
-          description: ""
+          description: Mentions if the app is for all ages or only mature audience
         - in: query
           name: minAge
           required: false
@@ -132,14 +132,14 @@ paths:
           schema:
             type: string
             format: date
-          description: ""
+          description: The date dApp was listed on or after
         - in: query
           name: listedOnOrBefore
           required: false
           schema:
             type: string
             format: date
-          description: ""
+          description: The date dApp was listed on or before
         - in: query
           name: allowedInCountries
           required: false
@@ -210,12 +210,12 @@ paths:
   /dapp/deleteApp:
     post:
       tags:
-        - Dapp Registry
+        - DApp Registry
       summary: Delete dApp
-      description: Removes the dapp from the store
-      operationId: deleteDapp
+      description: Removes the dApp from the store
+      operationId: deleteDApp
       requestBody:
-        description: Send the request with dapp parameters
+        description: Send the request with dApp parameters
         content:
           application/x-www-form-urlencoded:
             schema:
@@ -236,7 +236,7 @@ paths:
         - Store Registry
       summary: Featured dApps
       description: For finding featured dApps
-      operationId: getFeaturedDapps
+      operationId: getFeaturedDApps
       responses:
         "200":
           description: Successful operation
