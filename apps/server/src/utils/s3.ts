@@ -1,44 +1,61 @@
+import { Request } from "express";
+import multer, { FileFilterCallback, MulterError } from "multer";
 import AWS from "aws-sdk";
+import multerS3 from "multer-s3";
 import Debug from "debug";
+const { S3Client } = require("@aws-sdk/client-s3");
 
 const debug = Debug("meroku:server");
-const endpoint = new AWS.Endpoint(process.env.S3_ENDPOINT);
-const S3 = new AWS.S3({
-  endpoint: endpoint,
+const S3 = new AWS.S3();
+AWS.config.update({
   accessKeyId: process.env.S3_KEY,
   secretAccessKey: process.env.S3_SECRET,
   maxRetries: 10,
+  region: "us-east-2",
 });
 
 class awsS3 {
   constructor() {
-    this.uploadFile = this.uploadFile.bind(this);
     this.getFile = this.getFile.bind(this);
     this.getMetaData = this.getMetaData.bind(this);
     this.deleteFile = this.deleteFile.bind(this);
   }
 
   /**
-   * To upload a .apk format to s3  
-   * @param S3Data eg: { Bucket: "bucketName", Key: "objectKey", ACL: "public-read",
-                    Body: JSON.stringify(dataObject), ContentType: "application/json", 
-                    Metadata: { email: "sample@gmail.com", dappId: "300",}, 
-                } 
-   * @returns 
+   * multerS3 functionality to upload the multipart/formdata format file to aws-s3
+   * To know more refer to: https://www.npmjs.com/package/multer-s3
    */
-  uploadFile = async (S3Data: AWS.S3.PutObjectRequest) => {
-    const params = {
-      Bucket: S3Data.Bucket,
-      Key: S3Data.Key, // DappId is the unique identifier we want to use as key in S3
-      Body: S3Data.Body,
-      Metadata: S3Data.Metadata,
-    };
-    try {
-      await S3.upload(params).promise();
-    } catch (e) {
-      debug(e.message);
-    }
-  };
+  upload = multer({
+    storage: multerS3({
+      s3: new S3Client(),
+      acl: "public-read",
+      bucket: "meroku-uploads-dev",
+      metadata: function (
+        req: Request,
+        file: Express.Multer.File,
+        cb: FileFilterCallback
+      ) {
+        cb(null, Object.assign({}, req.body));
+      },
+      key: function (
+        req: Request,
+        file: Express.Multer.File,
+        cb: FileFilterCallback
+      ) {
+        cb(null, req.body.dappId);
+      },
+    }),
+    limits: { fileSize: 1024 * 1024 * 1024 * 10 }, // file upload size limit - 10GB
+    fileFilter: function (req: Request, file: Express.Multer.File, cb: any) {
+      const filetypes = /apk|zip/; // only .apk & .zip files are allowed
+      const mimetype = filetypes.test(file.mimetype);
+      if (mimetype) {
+        return cb(null, true);
+      } else {
+        cb("Error: Allowed file extensions - apk | zip !");
+      }
+    },
+  });
 
   /**
    * To get the .apk to download by any user
