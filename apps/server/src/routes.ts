@@ -3,6 +3,7 @@ import DappRegistoryController from "./controllers/dappRegistoryController";
 import StoreRegistoryController from "./controllers/storeRegistoryController";
 import DappFileUploadController from "./controllers/dappFileUploadController";
 import { body } from "express-validator";
+import dappFileUploadController from "./controllers/dappFileUploadController";
 
 const routes = Router();
 
@@ -10,7 +11,7 @@ const routes = Router();
 routes.get("/dapp", DappRegistoryController.getDapps);
 routes.get("/store/featured", StoreRegistoryController.getFeaturedDapps);
 routes.get("/store/title", StoreRegistoryController.getStoreTitle);
-routes.get("/dapp/s3", DappFileUploadController.getFile);
+routes.get("/dapp/s3/presignedurl", DappFileUploadController.getPreSignedUrl);
 
 // CREATE
 routes.post(
@@ -25,7 +26,8 @@ routes.post(
 routes.post(
   "/dapp/s3/upload",
   body("dappId").isString().not().isEmpty(),
-  DappFileUploadController.uploadFile
+  DappFileUploadController.upload.single("dAppFile"),
+  dappFileUploadController.uploadFile
 );
 
 // UPDATE
@@ -37,6 +39,13 @@ routes.put(
   body("githubID").isString().not().isEmpty(),
   body("dapp").not().isEmpty(),
   DappRegistoryController.updateDapp
+);
+routes.put(
+  "/dapp/s3/update",
+  body("dappId").isString().not().isEmpty(),
+  DappFileUploadController.deleteFile,
+  DappFileUploadController.upload.single("dAppFile"),
+  dappFileUploadController.uploadFile
 );
 
 // DELETE
