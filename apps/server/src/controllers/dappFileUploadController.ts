@@ -16,6 +16,7 @@ class awsS3Controller {
   constructor() {
     this.uploadFile = this.uploadFile.bind(this);
     this.getPreSignedUrl = this.getPreSignedUrl.bind(this);
+    this.updateFile = this.updateFile.bind(this);
     this.deleteFile = this.deleteFile.bind(this);
   }
 
@@ -58,10 +59,9 @@ class awsS3Controller {
   });
 
   /**
-   * File upload to aws-s3
+   * File upload to aws-s3 servers
    */
   uploadFile = async (req: Request, res: Response) => {
-    console.log(req.file);
     return res.status(200).json({ success: true, file: req.file });
   };
 
@@ -77,6 +77,31 @@ class awsS3Controller {
         Expires: 60 * 15, // 15 minutes
       });
       return res.status(200).json({ success: true, url: url });
+    } catch (e) {
+      return res.status(400).json({ errors: [{ msg: e.message }] });
+    }
+  };
+
+  /**
+   * Update file from aws s3 servers
+   * @param params eg: { Bucket: "bucketName", Key: "objectKey",} & file
+   */
+
+  updateFile = async (req: Request, res: Response) => {
+    const params: AWS.S3.DeleteObjectRequest = {
+      Bucket: process.env.BUCKET_NAME,
+      Key: <string>req.body.dappId,
+    };
+
+    try {
+      await s3
+        .deleteObject(params)
+        .promise()
+        .then(() => {
+          this.upload.single("dAppFile");
+        });
+
+      return res.status(200).json({ success: true, file: req.file });
     } catch (e) {
       return res.status(400).json({ errors: [{ msg: e.message }] });
     }
@@ -100,7 +125,7 @@ class awsS3Controller {
   };
 
   /**
-   * To get the metadata of a dappId without loading the file
+   * Get only metadata of a file without loading it
    * @param s3Data eg: { Bucket: "bucketName", Key: "objectKey", ACL: "public-read",
                     Body: JSON.stringify(dataObject), ContentType: "application/json", 
                     Metadata: { email: "sample@gmail.com", dappId: "300",}, 

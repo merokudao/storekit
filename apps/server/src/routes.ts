@@ -43,9 +43,7 @@ routes.put(
 routes.put(
   "/dapp/s3/update",
   body("dappId").isString().not().isEmpty(),
-  DappFileUploadController.deleteFile,
-  DappFileUploadController.upload.single("dAppFile"),
-  dappFileUploadController.uploadFile
+  DappFileUploadController.updateFile
 );
 
 // DELETE
