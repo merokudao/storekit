@@ -1,9 +1,10 @@
 import { Router } from "express";
+import { body } from "express-validator";
 import DappRegistoryController from "./controllers/dappRegistoryController";
 import StoreRegistoryController from "./controllers/storeRegistoryController";
 import DappFileUploadController from "./controllers/dappFileUploadController";
-import { body } from "express-validator";
 import dappFileUploadController from "./controllers/dappFileUploadController";
+import upload from "./utils/formdata";
 
 const routes = Router();
 
@@ -11,7 +12,7 @@ const routes = Router();
 routes.get("/dapp", DappRegistoryController.getDapps);
 routes.get("/store/featured", StoreRegistoryController.getFeaturedDapps);
 routes.get("/store/title", StoreRegistoryController.getStoreTitle);
-routes.get("/dapp/s3/presignedurl", DappFileUploadController.getPreSignedUrl);
+routes.get("/dapp/presignedurl", DappFileUploadController.getPreSignedUrl);
 
 // CREATE
 routes.post(
@@ -24,7 +25,8 @@ routes.post(
   DappRegistoryController.addDapp
 );
 routes.post(
-  "/dapp/s3/upload",
+  "/dapp/uploadFile",
+  upload.single("dAppFile"),
   body("dappId").isString().not().isEmpty(),
   DappFileUploadController.upload.single("dAppFile"),
   dappFileUploadController.uploadFile
@@ -41,7 +43,8 @@ routes.put(
   DappRegistoryController.updateDapp
 );
 routes.put(
-  "/dapp/s3/update",
+  "/dapp/updateFile",
+  upload.single("dAppFile"),
   body("dappId").isString().not().isEmpty(),
   DappFileUploadController.updateFile
 );
@@ -57,7 +60,7 @@ routes.post(
   DappRegistoryController.deleteDapp
 );
 routes.post(
-  "/dapp/s3/delete",
+  "/dapp/deleteFile",
   body("dappId").isString().not().isEmpty(),
   DappFileUploadController.deleteFile
 );
