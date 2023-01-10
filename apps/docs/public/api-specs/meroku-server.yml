@@ -445,6 +445,10 @@ components:
           type: string
           description: About dApp
           example: A really cool NFT Creator dApp
+        appUrl:
+          type: string
+          description: The URL of the dApp from where the webview will be loaded.
+          example: https://www.example.com
         images:
           type: object
           properties:
