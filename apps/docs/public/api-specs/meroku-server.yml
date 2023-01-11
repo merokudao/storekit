@@ -38,15 +38,15 @@ info:
 
     1. I am getting a `400 Resource not accessible by integration` error on update calls.
 
-      This can happen when the github token supplied does not have valid permissions. Ensure that
-      you are not sending `org` param. Right now, the fork can only happen on individual and not
-      at org level.
+    This can happen when the github token supplied does not have valid permissions. Ensure that
+    you are not sending `org` param. Right now, the fork can only happen on individual and not
+    at org level.
 
 
 
     2. I am getting a `400 Not Found` error on update calls.
 
-      Ensure that you are passing the correct github ID or the user who wants to make the update.
+    Ensure that you are passing the correct github ID or the user who wants to make the update.
 servers:
   - url: https://api-a.meroku.store
     description: Testing Server
@@ -63,7 +63,8 @@ paths:
       tags:
         - DApp Registry
       summary: Get dApp
-      description: Get all dApps or search by a keyword. Optionally, filter on specific attributes of the dApp.
+      description:
+        Get all dApps or search by a keyword. Optionally, filter on specific attributes of the dApp.
 
 
         This API call will get all the dApps or perform a text search.
@@ -71,7 +72,8 @@ paths:
       parameters:
         - in: query
           name: search
-          description: A string to be used for search. The search happens on the `name` and
+          description:
+            A string to be used for search. The search happens on the `name` and
             `tags` fields of the dApp. If this is not present, all dApps are returned.
           required: false
           schema:
@@ -158,7 +160,8 @@ paths:
         - in: query
           name: categories
           required: false
-          description: The categories in which dApps belong. Multiple categories are
+          description:
+            The categories in which dApps belong. Multiple categories are
             joined using OR operator.
           schema:
             type: array
@@ -259,7 +262,6 @@ paths:
         "405":
           description: Validation exception
 
-
   /dapp/deleteApp:
     post:
       tags:
@@ -317,6 +319,140 @@ paths:
                 type: string
         "400":
           description: Invalid status value
+
+  /dapp/presignedurl:
+    get:
+      tags:
+        - DApp Registry
+      summary: Pre-signed url
+      description: "Returns a temporary url to access the file. The link expires in 15 minutes"
+      operationId: getPreSignedUrl
+      parameters:
+        - in: query
+          name: dappId
+          description: "Key to the dApp file in servers"
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  url:
+                    type: string
+        "400":
+          description: Invalid status value
+
+  /dapp/uploadFile:
+    post:
+      tags:
+        - DApp Registry
+      summary: Upload dApp file
+      description: Uploading new dapp apk file to the servers
+      operationId: uploadFile
+      requestBody:
+        description: Send the request with dApp schema parameters
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                dAppId:
+                  type: string
+                  description: "DApp Id is Key value of file in servers"
+                file:
+                  type: string
+                  description: "The .apk/.zip format file of the dApp"
+                  format: binary
+        required: true
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  file:
+                    type: string
+                    format: binary
+        "400":
+          description: Operation failed
+
+  /dapp/updateFile:
+    put:
+      tags:
+        - DApp Registry
+      summary: Update dApp file
+      description: For updating the existing dApp file
+      operationId: updateFile
+      requestBody:
+        description: Send the request with the updated parameters
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                dAppId:
+                  type: string
+                  description: "DApp Id is Key value of file in servers"
+                file:
+                  type: string
+                  description: "The .apk/.zip format file of the dApp"
+                  format: binary
+        required: true
+      responses:
+        "200":
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  file:
+                    type: string
+                    format: binary
+        "400":
+          description: Operation failed
+
+  /dapp/deleteFile:
+    post:
+      tags:
+        - DApp Registry
+      summary: Delete dApp file
+      description: "Removes the dApp file from the servers"
+      operationId: deleteFile
+      requestBody:
+        description: "Send the request with dAppId"
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                key:
+                  type: string
+                  description: "Key value of file is dApp Id"
+        required: true
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: string
+        "405":
+          description: Invalid input
+
 components:
   schemas:
     DappIdWithDevCreds:
@@ -339,7 +475,7 @@ components:
           description: The GitHub ID of the developer
           example: r488it
         dappId:
-          type: integer
+          type: string
           description: The ID of the dApp
           example: example.store.dapp
         org:
@@ -456,7 +592,7 @@ components:
               type: string
               format: binary
               description: A URL to the logo of the dApp. Should be square and 512x512 in PNG format
-              example: 'https://example.com/logo.png'
+              example: "https://example.com/logo.png"
             banner:
               type: string
               format: binary
@@ -469,8 +605,8 @@ components:
                 type: string
                 format: binary
               example:
-              - https://www.example.com/screenshot_1.png
-              - https://www.example.com/screenshot_2.png
+                - https://www.example.com/screenshot_1.png
+                - https://www.example.com/screenshot_2.png
         repoUrl:
           type: string
           format: uri
@@ -517,8 +653,7 @@ components:
               - ios
               - web
               - android
-            example:
-              web
+            example: web
         geoRestrictions:
           type: object
           description: A list of countries where the dApp is available or unavailable. If this is not present, the dApp is available everywhere. If this is present, then one of either allowedCountries or blockedCountries should be present. If both are present, then the dApp is available in allowedCountries and unavailable in blockedCountries. The name of countries should be in ISO-3661-1 Alpha-2 Code.
@@ -582,17 +717,18 @@ components:
           items:
             type: string
           example:
-          - nft maker
+            - nft maker
         chains:
           type: array
           items:
             type: integer
           example:
-          - 1
-          - 137
+            - 1
+            - 137
         category:
           type: string
-          description: The category of the dApp. You can assign one category to your dApp.
+          description:
+            The category of the dApp. You can assign one category to your dApp.
             The category you select is particularly important for your app's discoverability on
             the dApp Store. This will be the category in which the app appears when users browse
             the dApp Store or filter search results, and it determines placement on the dApps tab
