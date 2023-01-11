@@ -1,14 +1,13 @@
 import { Router } from "express";
-import DappRegistoryController from "./controllers/dappRegistoryController";
-import StoreRegistoryController from "./controllers/storeRegistoryController";
+import { DappFileUploadController, DappRegistryController, GhAppController, StoreRegistryController } from "./controllers";
 import { body } from "express-validator";
 
 const routes = Router();
 
 // READ
-routes.get("/dapp", DappRegistoryController.getDapps);
-routes.get("/store/featured", StoreRegistoryController.getFeaturedDapps);
-routes.get("/store/title", StoreRegistoryController.getStoreTitle);
+routes.get("/dapp", DappRegistryController.getDapps);
+routes.get("/store/featured", StoreRegistryController.getFeaturedDapps);
+routes.get("/store/title", StoreRegistryController.getStoreTitle);
 
 // CREATE
 routes.post(
@@ -18,7 +17,7 @@ routes.post(
   body("accessToken").isString().not().isEmpty(),
   body("githubID").isString().not().isEmpty(),
   body("dapp").not().isEmpty(),
-  DappRegistoryController.addDapp
+  DappRegistryController.addDapp
 );
 
 // UPDATE
@@ -29,7 +28,7 @@ routes.put(
   body("accessToken").isString().not().isEmpty(),
   body("githubID").isString().not().isEmpty(),
   body("dapp").not().isEmpty(),
-  DappRegistoryController.updateDapp
+  DappRegistryController.updateDapp
 );
 
 // DELETE
@@ -40,7 +39,27 @@ routes.post(
   body("accessToken").isString().not().isEmpty(),
   body("githubID").isString().not().isEmpty(),
   body("dappId").isString().not().isEmpty(),
-  DappRegistoryController.deleteDapp
+  DappRegistryController.deleteDapp
+);
+
+routes.get("/app/:githubID/installed", GhAppController.isAppInstalled);
+
+routes.get("/app/installUrl", GhAppController.getInstallURL);
+
+const cpUpload = DappFileUploadController
+  .upload
+  .fields(
+    [
+      { name: 'logo', maxCount: 1 },
+      { name: 'banner', maxCount: 1 },
+      { name: 'screenshots', maxCount: 5},
+      { name: 'build', maxCount: 1}
+    ]);
+routes.post(
+  "/dapp/uploadFile",
+  body("dappId").isString().not().isEmpty(),
+  cpUpload,
+  DappFileUploadController.uploadFile
 );
 
 export default routes;

@@ -3,7 +3,7 @@ import { DappStoreRegistry } from "@merokudao/dapp-store-registry";
 
 const DappStore = new DappStoreRegistry();
 
-class StoreRegistory {
+class StoreRegistry {
   constructor() {
     this.getStoreTitle = this.getStoreTitle.bind(this);
     this.getFeaturedDapps = this.getFeaturedDapps.bind(this);
@@ -30,4 +30,4 @@ class StoreRegistory {
   };
 }
 
-export default new StoreRegistory();
+export const StoreRegistryController = new StoreRegistry();

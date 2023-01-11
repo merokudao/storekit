@@ -134,6 +134,18 @@ class DappRegistry {
       debug(`accessToken: ${accessToken}`);
       debug(`githubID: ${githubID}`);
       debug(`org: ${org}`);
+      const appInstalled = await DappStore.isGHAppInstalled(githubID);
+      if (!appInstalled) {
+        const installUrl = await DappStore.ghAppInstallURL();
+        return res.status(400).json({
+          errors: [
+            {
+              msg:
+                `Dappstore app is not installed on your github account. Please install it and try again. Visit ${installUrl} to install the app.`
+            }
+          ]
+        });
+      }
 
       try {
         const response = await DappStore.addOrUpdateDapp(
@@ -218,4 +230,4 @@ class DappRegistry {
   };
 }
 
-export default new DappRegistry();
+export const DappRegistryController =  new DappRegistry();
