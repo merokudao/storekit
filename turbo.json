@@ -17,13 +17,14 @@
     },
     "server":{
        "outputs": ["dist/**", ".next/**"],
-       "env":["S3_ENDPOINT", "S3_KEY", "S3_SECRET"]
+       "env":["./apps/server/.env"]
     }
   },
   "globalEnv": [
     "NEXT_PUBLIC_ALLOWED_EMAIL_DOMAINS",
     "NEXT_PUBLIC_ALLOWED_EMAILS",
     "GITHUB_ID",
-    "GITHUB_SECRET"
+    "GITHUB_SECRET",
+    "BUCKET_NAME"
   ]
 }

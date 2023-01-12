@@ -12,7 +12,11 @@ class App {
     this.middlewares();
 
     const corsOptions = {
-      origin: [ /\.meroku\.store$/, 'http://localhost:3000', 'https://staging-dapp-registry.netlify.app']
+      origin: [ /\.meroku\.store$/,
+        'http://localhost:3000',
+        'https://staging-dapp-registry.netlify.app',
+        'https://editor.swagger.io',
+      ]
     }
 
     this.server.use(cors(corsOptions));

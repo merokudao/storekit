@@ -1,7 +1,6 @@
 import { Request, Response } from "express";
 import multer, { FileFilterCallback } from "multer";
 import AWS from "aws-sdk";
-import multerS3 from "multer-s3";
 import Debug from "debug";
 import { S3Client, AbortMultipartUploadCommand } from "@aws-sdk/client-s3";
 
@@ -11,65 +10,47 @@ const debug = Debug("meroku:server");
 
 const s3 = new AWS.S3({
   signatureVersion: "v4",
-  accessKeyId: process.env.S3_KEY,
-  secretAccessKey: process.env.S3_SECRET,
-  region: "ap-south-1",
+  accessKeyId: process.env.AWS_KEY,
+  secretAccessKey: process.env.AWS_SECRET,
+  region: process.env.AWS_S3_REGION,
 });
 
 const s3Client = new S3Client({ region: "ap-south-1" });
 
 class awsS3Controller {
   constructor() {
-    this.uploadFile = this.uploadFile.bind(this);
     this.getPreSignedUrl = this.getPreSignedUrl.bind(this);
     this.updateFile = this.updateFile.bind(this);
     this.deleteFile = this.deleteFile.bind(this);
   }
 
   /**
-  * multerS3 functionality to upload the multipart/formdata format file to aws-s3
-  * To know more refer to: https://www.npmjs.com/package/multer-s3
-  */
-  upload = multer({
-    storage: multerS3({
-      s3: s3Client,
-      acl: "private",
-      bucket: process.env.BUCKET_NAME || 'sd',
-      contentDisposition: "attachment",
-      contentType: multerS3.AUTO_CONTENT_TYPE,
-      metadata: function (
-        req: Request,
-        file: Express.Multer.File,
-        cb: FileFilterCallback
-      ) {
-        cb(null, Object.assign({}, req.body));
-      },
-      key: function (
-        req: Request,
-        file: Express.Multer.File,
-        cb: FileFilterCallback
-      ) {
-        cb(null, req.body.dappId);
-      },
-    }),
-    limits: { fileSize: 1024 * 1024 * 1024 * 10 }, // file upload size limit - 10GB
-    fileFilter: function (req: Request, file: Express.Multer.File, cb: any) {
-      const filetypes = /apk|zip/; // only .apk & .zip files are allowed
-      const mimetype = filetypes.test(file.mimetype);
-      if (mimetype) {
-        return cb(null, true);
-      } else {
-        cb("Error: Allowed file extensions - apk | zip !");
-      }
-    },
-  });
-
-  /**
   * File upload to aws-s3 servers
   */
-  uploadFile = async (req: Request, res: Response) => {
-    return res.status(200).json({ success: true, file: req.file });
-  };
+ preSignedUrlUpload = async (req: Request, res: Response) => {
+    const dappID = req.params.dappId;
+    const field = req.params.field;
+
+    let bucket = process.env.BUCKET_NAME_PUBLIC;
+    let contentType = 'image/*';
+
+    if (field === "build") {
+      bucket = process.env.BUCKET_NAME_PRIVATE;
+      contentType = 'application/zip';
+    }
+
+    try {
+      const url = s3.getSignedUrl("putObject", {
+        Bucket: bucket,
+        Key: `${dappID}/${field}`,
+        Expires: 60 * 15, // 15 minutes
+        ContentType: contentType
+      });
+      return res.status(200).json({ success: true, url: url });
+    } catch (e) {
+      return res.status(400).json({ errors: [{ msg: e.message }] });
+    }
+ }
 
   /**
   * Get file presigned url from aws-s3 servers
@@ -78,7 +59,7 @@ class awsS3Controller {
   getPreSignedUrl = async (req: Request, res: Response) => {
     try {
       const url = s3.getSignedUrl("getObject", {
-        Bucket: process.env.BUCKET_NAME,
+        Bucket: process.env.BUCKET_NAME_PRIVATE,
         Key: <string>req.query.dappId,
         Expires: 60 * 15, // 15 minutes
       });
@@ -95,7 +76,7 @@ class awsS3Controller {
 
   updateFile = async (req: Request, res: Response) => {
     const params: AWS.S3.DeleteObjectRequest = {
-      Bucket: process.env.BUCKET_NAME,
+      Bucket: process.env.BUCKET_NAME_PRIVATE,
       Key: <string>req.body.dappId,
     };
 
@@ -104,7 +85,6 @@ class awsS3Controller {
         .deleteObject(params)
         .promise()
         .then(() => {
-          this.upload.single("dAppFile");
         });
 
       return res.status(200).json({ success: true, file: req.file });
@@ -119,7 +99,7 @@ class awsS3Controller {
   */
   deleteFile = async (req: Request, res: Response) => {
     const params: AWS.S3.DeleteObjectRequest = {
-      Bucket: process.env.BUCKET_NAME,
+      Bucket: process.env.BUCKET_NAME_PRIVATE,
       Key: <string>req.body.dappId,
     };
     try {

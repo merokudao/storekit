@@ -1,6 +1,7 @@
-import { Router } from "express";
+import { query, Router } from "express";
 import { DappFileUploadController, DappRegistryController, GhAppController, StoreRegistryController } from "./controllers";
 import { body } from "express-validator";
+import multer from "multer";
 
 const routes = Router();
 
@@ -46,20 +47,9 @@ routes.get("/app/:githubID/installed", GhAppController.isAppInstalled);
 
 routes.get("/app/installUrl", GhAppController.getInstallURL);
 
-const cpUpload = DappFileUploadController
-  .upload
-  .fields(
-    [
-      { name: 'logo', maxCount: 1 },
-      { name: 'banner', maxCount: 1 },
-      { name: 'screenshots', maxCount: 5},
-      { name: 'build', maxCount: 1}
-    ]);
 routes.post(
-  "/dapp/uploadFile",
-  body("dappId").isString().not().isEmpty(),
-  cpUpload,
-  DappFileUploadController.uploadFile
+  "/dapp/:dappId/upload/:field",
+  DappFileUploadController.preSignedUrlUpload
 );
 
 export default routes;
